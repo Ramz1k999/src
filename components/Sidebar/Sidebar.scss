@@ -1,0 +1,184 @@
+// sidebar.scss
+
+// Переменные, соответствующие стилю вашего проекта
+$primary-color: #2d7d6f;
+$primary-color-dark: darken($primary-color, 10%);
+$accent-color: #ff6b8a; // Розовый цвет из логотипа
+$text-color: #333;
+$text-color-light: #666;
+$border-color: #e1e1e1;
+$hover-bg: #f9f9f9;
+$active-bg: #f0f8f7;
+$sidebar-width: 280px;
+$sidebar-transition: all 0.3s ease;
+$box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: $sidebar-width;
+  background-color: #fff;
+  box-shadow: $box-shadow;
+  transition: $sidebar-transition;
+  z-index: 999; // Меньше чем у header
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  &__logo-container {
+    padding: 15px;
+    border-bottom: 1px solid $border-color;
+  }
+
+  &__logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  &__logo-image {
+    height: 40px;
+    width: auto;
+    margin-right: 10px;
+  }
+
+  &__logo-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__logo-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: $accent-color;
+    text-transform: uppercase;
+  }
+
+  &__logo-tagline {
+    font-size: 12px;
+    color: $text-color-light;
+  }
+
+  &__nav {
+    flex: 1;
+    padding: 15px 0;
+  }
+
+  &__menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__menu-item {
+    margin-bottom: 5px;
+  }
+
+  &__menu-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: $text-color;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    margin: 0 5px;
+
+    &:hover {
+      background-color: $hover-bg;
+    }
+
+    &.active {
+      background-color: $active-bg;
+      color: $primary-color;
+      font-weight: 500;
+    }
+
+    i {
+      margin-right: 12px;
+      font-size: 18px;
+      width: 20px;
+      text-align: center;
+    }
+  }
+
+  &__menu-divider {
+    padding: 15px 15px 5px;
+    color: $text-color-light;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-top: 1px solid $border-color;
+    margin-top: 10px;
+  }
+
+  &__footer {
+    padding: 15px;
+    border-top: 1px solid $border-color;
+    text-align: center;
+    font-size: 12px;
+    color: $text-color-light;
+  }
+
+  &__footer-link {
+    color: $primary-color;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Адаптивность для мобильных устройств
+@media (max-width: 992px) {
+  .sidebar {
+    transform: translateX(-100%);
+
+    &--visible {
+      transform: translateX(0);
+    }
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    display: none;
+
+    &--visible {
+      display: block;
+    }
+  }
+}
+
+// Иконки (можно заменить на библиотеку иконок)
+.icon-products:before {
+  content: "📦";
+}
+
+.icon-cart:before {
+  content: "🛒";
+}
+
+.icon-orders:before {
+  content: "📋";
+}
+
+.icon-admin-products:before {
+  content: "🔧";
+}
+
+.icon-admin-orders:before {
+  content: "📊";
+}
+
+.icon-admin-users:before {
+  content: "👥";
+}

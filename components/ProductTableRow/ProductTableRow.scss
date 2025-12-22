@@ -1,0 +1,51 @@
+// components/ProductTableRow/ProductTableRow.scss
+.product-row {
+  &:hover {
+    background-color: #f9f9f9;
+  }
+
+  &__name {
+    font-weight: 500;
+  }
+
+  &__price {
+    white-space: nowrap;
+  }
+
+  &__date {
+    white-space: nowrap;
+  }
+
+  &__quantity {
+    &-input {
+      width: 60px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: center;
+    }
+  }
+
+  &__cart-button {
+    background-color: #2d7d6f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: darken(#2d7d6f, 10%);
+    }
+
+    &.loading {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+}

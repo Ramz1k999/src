@@ -1,0 +1,158 @@
+.product-list {
+  padding: 30px 0;
+
+  &__title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  &__search {
+    display: flex;
+    margin-bottom: 20px;
+    gap: 10px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+
+  &__search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+
+  &__quantity-input {
+    width: 100px;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+
+  &__search-button {
+    background-color: #2d7d6f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-right: 5px;
+    }
+
+    &:hover {
+      background-color: darken(#2d7d6f, 10%);
+    }
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #666;
+
+    i {
+      margin-right: 5px;
+      color: #2d7d6f;
+    }
+  }
+
+  &__loading {
+    text-align: center;
+    padding: 30px;
+    font-size: 18px;
+    color: #666;
+  }
+
+  &__table-container {
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #e1e1e1;
+    }
+
+    th {
+      background-color: #2d7d6f;
+      color: white;
+      font-weight: 600;
+
+      &.sortable {
+        cursor: pointer;
+
+        i {
+          margin-left: 5px;
+        }
+      }
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+  }
+
+  &__quantity {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  &__cart-button {
+    background-color: #2d7d6f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover {
+      background-color: darken(#2d7d6f, 10%);
+    }
+  }
+}
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: #2d7d6f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+
+  &:hover {
+    background-color: darken(#2d7d6f, 10%);
+  }
+}
