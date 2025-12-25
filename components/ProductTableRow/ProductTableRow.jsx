@@ -52,8 +52,9 @@ const ProductTableRow = ({ product, updateCartItemsCount }) => {
           className={`product-row__cart-button ${isLoading ? 'loading' : ''}`}
           onClick={handleAddToCart}
           disabled={isLoading}
+          aria-label="Добавить в корзину"
         >
-          <i className="icon-cart"></i>
+          <i className="fas fa-shopping-cart"></i>
         </button>
       </td>
     </tr>

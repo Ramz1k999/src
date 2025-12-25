@@ -1,0 +1,216 @@
+.orders {
+  padding: 30px 0; // Изменено с 20px на 30px 0
+
+  &__title {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  &__table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background-color: #2d7d6f;
+      color: white;
+      font-weight: 500;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f0f0;
+    }
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+
+    &--pending {
+      background-color: #f39c12;
+      color: white;
+    }
+
+    &--processing {
+      background-color: #3498db;
+      color: white;
+    }
+
+    &--shipped {
+      background-color: #9b59b6;
+      color: white;
+    }
+
+    &--delivered {
+      background-color: #2ecc71;
+      color: white;
+    }
+
+    &--cancelled {
+      background-color: #e74c3c;
+      color: white;
+    }
+  }
+
+  &__view-button, &__cancel-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    margin-right: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+
+    i {
+      margin-right: 5px;
+      font-style: normal;
+    }
+  }
+
+  &__view-button {
+    background-color: #2d7d6f;
+    color: white;
+
+    &:hover {
+      background-color: darken(#2d7d6f, 10%);
+    }
+  }
+
+  &__cancel-button {
+    background-color: #f5f5f5;
+    color: #e74c3c;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+
+  &__pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+    &-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      margin: 0 5px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      background-color: white;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover:not(:disabled) {
+        border-color: #2d7d6f;
+        color: #2d7d6f;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.active {
+        background-color: #2d7d6f;
+        border-color: #2d7d6f;
+        color: white;
+      }
+
+      i {
+        font-style: normal;
+      }
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 40px 0;
+
+    p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #666;
+    }
+  }
+
+  &__shop-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #2d7d6f;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: darken(#2d7d6f, 10%);
+    }
+  }
+
+  &__loading, &__error {
+    text-align: center;
+    padding: 40px 0;
+    font-size: 18px;
+    color: #666;
+  }
+
+  &__error {
+    color: #e74c3c;
+  }
+}
+
+// Стили для иконок Font Awesome
+i[class^="fas"],
+i[class*=" fas"] {
+  font-style: normal !important;
+}
+
+// Адаптивность для мобильных устройств
+@media (max-width: 768px) {
+  .orders {
+    &__table {
+      th, td {
+        padding: 8px;
+      }
+    }
+
+    &__view-button, &__cancel-button {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .orders {
+    &__table {
+      th:nth-child(2), td:nth-child(2) { // Скрываем колонку с датой
+        display: none;
+      }
+    }
+  }
+}

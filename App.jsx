@@ -6,6 +6,7 @@ import ProductList from './components/ProductList/ProductList';
 import Cart from './components/Cart/Cart';
 import Checkout from './components/Checkout/Checkout';
 import OrderConfirmation from './components/OrderConfirmation/OrderConfirmation';
+import Orders from './components/Orders/Orders'; // Добавлен импорт компонента Orders
 import Login from './components/Auth/Auth';
 import NotFound from './components/NotFound/NotFound';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
@@ -17,30 +18,76 @@ import UserForm from './components/Admin/Users/UserForm';
 import { getCartItems } from './services/api';
 import './App.scss';
 
+// Импортируем Font Awesome
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
+// Создаем отдельный компонент для выхода из системы
+const LogoutRoute = () => {
+  useEffect(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // Создаем событие для обновления состояния авторизации
+    window.dispatchEvent(new Event('auth-change'));
+  }, []);
+
+  return <Navigate to="/login" replace />;
+};
+
 function App() {
   const [cartItemsCount, setCartItemsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
-  // Проверяем, является ли пользователь администратором
-  const isAdmin = () => {
-    try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      return user.role === 'admin';
-    } catch (error) {
-      return false;
+  // Используем useState вместо useMemo для отслеживания состояния авторизации
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const [userIsAdmin, setUserIsAdmin] = useState(false);
+
+  // Функция для проверки авторизации и роли пользователя
+  const checkAuth = () => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+
+    if (token) {
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        setUserIsAdmin(user.role === 'admin');
+      } catch (error) {
+        setUserIsAdmin(false);
+      }
+    } else {
+      setUserIsAdmin(false);
     }
   };
 
-  // Загрузка количества товаров в корзине при первом рендере
+  // Эффект для отслеживания изменений в авторизации
+  useEffect(() => {
+    // Проверяем при монтировании компонента
+    checkAuth();
+
+    // Добавляем слушатель события для обновления состояния авторизации
+    const handleAuthChange = () => {
+      checkAuth();
+    };
+
+    window.addEventListener('auth-change', handleAuthChange);
+    window.addEventListener('storage', handleAuthChange); // Для синхронизации между вкладками
+
+    return () => {
+      window.removeEventListener('auth-change', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
+  }, []);
+
+  // Загрузка количества товаров в корзине при изменении состояния авторизации
   useEffect(() => {
     const fetchCartItemsCount = async () => {
       try {
-        // Проверяем, авторизован ли пользователь
-        if (localStorage.getItem('token')) {
+        if (isLoggedIn) {
           const response = await getCartItems();
           const count = response.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
           setCartItemsCount(count);
+        } else {
+          setCartItemsCount(0);
         }
       } catch (error) {
         console.error('Error fetching cart items count:', error);
@@ -50,7 +97,7 @@ function App() {
     };
 
     fetchCartItemsCount();
-  }, []);
+  }, [isLoggedIn]);
 
   // Функция для обновления количества товаров в корзине
   const updateCartItemsCount = (count) => {
@@ -62,50 +109,70 @@ function App() {
     setSidebarVisible(!sidebarVisible);
   };
 
-  // Функция для обработки выхода из системы
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setCartItemsCount(0);
-    return <Navigate to="/" replace />;
+  // Функция для закрытия боковой панели
+  const closeSidebar = () => {
+    setSidebarVisible(false);
   };
 
   return (
     <Router>
       <div className="app">
-        <Header
-          cartItemsCount={cartItemsCount}
-          toggleSidebar={toggleSidebar}
-          isLoggedIn={!!localStorage.getItem('token')}
-          isAdmin={isAdmin()}
-        />
+        {/* Показываем Header только для авторизованных пользователей */}
+        {isLoggedIn && (
+          <Header
+            cartItemsCount={cartItemsCount}
+            toggleSidebar={toggleSidebar}
+            isLoggedIn={isLoggedIn}
+            isAdmin={userIsAdmin}
+          />
+        )}
 
-        {localStorage.getItem('token') && (
+        {/* Боковое меню */}
+        {isLoggedIn && (
           <Sidebar
             visible={sidebarVisible}
-            onClose={() => setSidebarVisible(false)}
-            isAdmin={isAdmin()}
+            onClose={closeSidebar}
+            isAdmin={userIsAdmin}
           />
         )}
 
         <main className={`main ${sidebarVisible ? 'sidebar-visible' : ''}`}>
-          {isLoading ? (
+          {isLoading && isLoggedIn ? (
             <div className="loading-spinner">Загрузка...</div>
           ) : (
             <Routes>
-              {/* Публичные маршруты */}
-              <Route path="/" element={<ProductList updateCartItemsCount={updateCartItemsCount} />} />
-              <Route path="/cart" element={<Cart updateCartItemsCount={updateCartItemsCount} />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/logout" element={handleLogout()} />
+              {/* Перенаправление с корневого маршрута на страницу входа, если пользователь не авторизован */}
+              <Route path="/" element={
+                isLoggedIn ?
+                <ProductList updateCartItemsCount={updateCartItemsCount} /> :
+                <Navigate to="/login" replace />
+              } />
 
-              {/* Защищенные маршруты для обычных пользователей */}
+              {/* Публичные маршруты */}
+              <Route path="/login" element={isLoggedIn ? <Navigate to="/" replace /> : <Login />} />
+              <Route path="/logout" element={<LogoutRoute />} />
+
+              {/* Защищенные маршруты - доступны только авторизованным пользователям */}
+              <Route path="/cart" element={
+                <ProtectedRoute>
+                  <Cart updateCartItemsCount={updateCartItemsCount} />
+                </ProtectedRoute>
+              } />
               <Route path="/checkout" element={
                 <ProtectedRoute>
                   <Checkout updateCartItemsCount={updateCartItemsCount} />
                 </ProtectedRoute>
               } />
-              <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
+              <Route path="/order-confirmation/:id" element={
+                <ProtectedRoute>
+                  <OrderConfirmation />
+                </ProtectedRoute>
+              } />
+              <Route path="/orders" element={
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              } />
 
               {/* Административные маршруты */}
               <Route path="/admin" element={
@@ -127,9 +194,10 @@ function App() {
             </Routes>
           )}
         </main>
+
+        {/* Пустой футер */}
         <footer className="footer">
           <div className="container">
-            <p>&copy; {new Date().getFullYear()} PERFUME FOR YOU. Все права защищены.</p>
           </div>
         </footer>
       </div>

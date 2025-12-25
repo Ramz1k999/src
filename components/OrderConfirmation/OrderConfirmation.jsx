@@ -6,117 +6,142 @@ import './OrderConfirmation.scss';
 const OrderConfirmation = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        setLoading(true);
-        const response = await getOrderById(id);
-        setOrder(response);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching order:', err);
-        setError('Не удалось загрузить информацию о заказе. Пожалуйста, попробуйте позже.');
-        setLoading(false);
-      }
-    };
-
     fetchOrder();
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="order-confirmation">
-        <div className="container">
-          <div className="order-confirmation__loading">Загрузка информации о заказе...</div>
-        </div>
-      </div>
-    );
+  const fetchOrder = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getOrderById(parseInt(id));
+      setOrder(data);
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      setError('Ошибка при загрузке заказа. Пожалуйста, попробуйте позже.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU');
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('ru-RU').format(price) + ' руб.';
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'В обработке';
+      case 'processing':
+        return 'Комплектуется';
+      case 'shipped':
+        return 'Отправлен';
+      case 'delivered':
+        return 'Доставлен';
+      case 'cancelled':
+        return 'Отменен';
+      default:
+        return 'Неизвестно';
+    }
+  };
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'order-confirmation__status--pending';
+      case 'processing':
+        return 'order-confirmation__status--processing';
+      case 'shipped':
+        return 'order-confirmation__status--shipped';
+      case 'delivered':
+        return 'order-confirmation__status--delivered';
+      case 'cancelled':
+        return 'order-confirmation__status--cancelled';
+      default:
+        return '';
+    }
+  };
+
+  if (isLoading) {
+    return <div className="order-confirmation__loading">Загрузка заказа...</div>;
   }
 
   if (error) {
-    return (
-      <div className="order-confirmation">
-        <div className="container">
-          <div className="order-confirmation__error">{error}</div>
-          <Link to="/" className="order-confirmation__button">Вернуться на главную</Link>
-        </div>
-      </div>
-    );
+    return <div className="order-confirmation__error">{error}</div>;
+  }
+
+  if (!order) {
+    return <div className="order-confirmation__error">Заказ не найден</div>;
   }
 
   return (
     <div className="order-confirmation">
-      <div className="container">
-        <div className="order-confirmation__content">
-          <div className="order-confirmation__icon">
-            <i className="icon-check-circle"></i>
-          </div>
+      <h1 className="order-confirmation__title">Заказ #{order.id}</h1>
 
-          <h1 className="order-confirmation__title">Заказ успешно оформлен!</h1>
+      <div className="order-confirmation__status-container">
+        <span className={`order-confirmation__status ${getStatusClass(order.status)}`}>
+          {getStatusLabel(order.status)}
+        </span>
+        <span className="order-confirmation__date">от {formatDate(order.created_at)}</span>
+      </div>
 
-          <div className="order-confirmation__details">
-            <p className="order-confirmation__order-number">
-              Номер заказа: <span>{order?.id || id}</span>
-            </p>
+      <div className="order-confirmation__details">
+        <div className="order-confirmation__section">
+          <h2 className="order-confirmation__section-title">Информация о доставке</h2>
+          <p><strong>Адрес:</strong> {order.shipping_address}</p>
+          <p><strong>Способ оплаты:</strong> {order.payment_method === 'card' ? 'Банковская карта' : 'Наличные'}</p>
+        </div>
 
-            <p className="order-confirmation__message">
-              Спасибо за ваш заказ! Мы отправили подтверждение на указанный вами email.
-              Наш менеджер свяжется с вами в ближайшее время для уточнения деталей.
-            </p>
-
-            {order && (
-              <div className="order-confirmation__summary">
-                <h2 className="order-confirmation__summary-title">Информация о заказе</h2>
-
-                <div className="order-confirmation__info-group">
-                  <div className="order-confirmation__info-item">
-                    <span className="order-confirmation__info-label">Дата заказа:</span>
-                    <span className="order-confirmation__info-value">
-                      {new Date(order.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  <div className="order-confirmation__info-item">
-                    <span className="order-confirmation__info-label">Статус:</span>
-                    <span className="order-confirmation__info-value order-confirmation__status">
-                      Принят в обработку
-                    </span>
-                  </div>
-
-                  <div className="order-confirmation__info-item">
-                    <span className="order-confirmation__info-label">Способ доставки:</span>
-                    <span className="order-confirmation__info-value">
-                      {order.delivery_method === 'courier' ? 'Курьером' : 'Самовывоз'}
-                    </span>
-                  </div>
-
-                  <div className="order-confirmation__info-item">
-                    <span className="order-confirmation__info-label">Способ оплаты:</span>
-                    <span className="order-confirmation__info-value">
-                      {order.payment_method === 'card' ? 'Банковской картой' : 'Наличными при получении'}
-                    </span>
-                  </div>
-
-                  <div className="order-confirmation__info-item">
-                    <span className="order-confirmation__info-label">Сумма заказа:</span>
-                    <span className="order-confirmation__info-value order-confirmation__total">
-                      {order.total_amount.toFixed(1)} руб.
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="order-confirmation__actions">
-            <Link to="/" className="order-confirmation__button">
-              Продолжить покупки
-            </Link>
+        <div className="order-confirmation__section">
+          <h2 className="order-confirmation__section-title">Товары в заказе</h2>
+          <div className="order-confirmation__table-container">
+            <table className="order-confirmation__table">
+              <thead>
+                <tr>
+                  <th>Название товара</th>
+                  <th>Цена</th>
+                  <th>Количество</th>
+                  <th>Сумма</th>
+                </tr>
+              </thead>
+              <tbody>
+                {order.items.map(item => (
+                  <tr key={item.product_id}>
+                    <td>{item.product?.name || "Название товара отсутствует"}</td>
+                    <td>{formatPrice(item.price)}</td>
+                    <td>{item.quantity}</td>
+                    <td>{formatPrice(item.price * item.quantity)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan="3" className="order-confirmation__total-label">Итого:</td>
+                  <td className="order-confirmation__total-value">{formatPrice(order.total)}</td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </div>
+      </div>
+
+      <div className="order-confirmation__actions">
+        <Link to="/orders" className="order-confirmation__back-button">
+          <i className="fas fa-arrow-left"></i> Вернуться к списку заказов
+        </Link>
+
+        {order.status === 'pending' && (
+          <button className="order-confirmation__cancel-button">
+            <i className="fas fa-times"></i> Отменить заказ
+          </button>
+        )}
       </div>
     </div>
   );

@@ -76,11 +76,14 @@ const Auth = () => {
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
 
-      // Перенаправляем пользователя
-      const redirectTo = location.state?.from?.pathname || '/';
+      // Создаем событие для обновления состояния авторизации
+      window.dispatchEvent(new Event('auth-change'));
+
+      // Перенаправляем пользователя на главную страницу вместо корзины
+      const redirectTo = location.state?.from?.pathname === '/cart' ? '/' : (location.state?.from?.pathname || '/');
       navigate(redirectTo);
     } catch (error) {
-      console.error('Auth error:', error);
+      console.error('Login error:', error);
       setLoginError(error.message || 'Неверный email или пароль. Пожалуйста, попробуйте снова.');
       setIsSubmitting(false);
     }
@@ -91,23 +94,20 @@ const Auth = () => {
   };
 
   return (
-    <div className="login">
-      <div className="login__container">
-        <div className="login__logo">
-          <img src={logoImage} alt="PERFUME FOR YOU" />
-          <h1>PERFUME FOR YOU</h1>
+    <div className="auth">
+      <div className="auth__container">
+        <div className="auth__logo">
+          <img src={logoImage} alt="SHOPAHOLIC" />
         </div>
 
-        <h2 className="login__title">Вход в систему</h2>
-
         {loginError && (
-          <div className="login__error">
+          <div className="auth__error">
             {loginError}
           </div>
         )}
 
-        <form className="login__form" onSubmit={handleSubmit}>
-          <div className={`login__form-group ${formErrors.email ? 'has-error' : ''}`}>
+        <form className="auth__form" onSubmit={handleSubmit}>
+          <div className={`auth__form-group ${formErrors.email ? 'has-error' : ''}`}>
             <label htmlFor="email">Email</label>
             <input
               type="email"
@@ -117,13 +117,14 @@ const Auth = () => {
               onChange={handleInputChange}
               placeholder="Введите ваш email"
               autoComplete="email"
+              className="auth__input"
             />
-            {formErrors.email && <div className="login__error-message">{formErrors.email}</div>}
+            {formErrors.email && <div className="auth__error-message">{formErrors.email}</div>}
           </div>
 
-          <div className={`login__form-group ${formErrors.password ? 'has-error' : ''}`}>
+          <div className={`auth__form-group ${formErrors.password ? 'has-error' : ''}`}>
             <label htmlFor="password">Пароль</label>
-            <div className="login__password-input">
+            <div className="auth__password-input">
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
@@ -132,29 +133,30 @@ const Auth = () => {
                 onChange={handleInputChange}
                 placeholder="Введите ваш пароль"
                 autoComplete="current-password"
+                className="auth__input"
               />
               <button
                 type="button"
-                className="login__toggle-password"
+                className="auth__toggle-password"
                 onClick={togglePasswordVisibility}
                 aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
               >
-                <i className={`icon-${showPassword ? 'eye-off' : 'eye'}`}></i>
+                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
               </button>
             </div>
-            {formErrors.password && <div className="login__error-message">{formErrors.password}</div>}
+            {formErrors.password && <div className="auth__error-message">{formErrors.password}</div>}
           </div>
 
           <button
             type="submit"
-            className="login__submit-button"
+            className="auth__submit-button"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Вход...' : 'Войти'}
           </button>
         </form>
 
-        <div className="login__footer">
+        <div className="auth__footer">
           <p>Если у вас нет учетной записи или вы забыли пароль, пожалуйста, обратитесь к администратору.</p>
         </div>
       </div>

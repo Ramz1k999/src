@@ -1,89 +1,49 @@
 .cart {
-  padding: 30px 0;
+  padding: 30px 0; // Изменено с 20px на 30px 0
 
   &__title {
     font-size: 28px;
-    font-weight: bold;
     margin-bottom: 20px;
-  }
-
-  &__loading {
-    text-align: center;
-    padding: 30px;
-    font-size: 18px;
-    color: #666;
-  }
-
-  &__error {
-    text-align: center;
-    padding: 20px;
-    color: #d9534f;
-    background-color: #f2dede;
-    border: 1px solid #ebccd1;
-    border-radius: 4px;
-    margin-bottom: 20px;
-  }
-
-  &__empty {
-    text-align: center;
-    padding: 40px 0;
-
-    p {
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
-  }
-
-  &__continue-shopping {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #2d7d6f;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: 500;
-
-    &:hover {
-      background-color: darken(#2d7d6f, 10%);
-    }
+    color: #333;
   }
 
   &__actions {
     display: flex;
-    gap: 10px;
     margin-bottom: 20px;
+    gap: 10px;
 
     @media (max-width: 576px) {
       flex-direction: column;
     }
   }
 
-  &__checkout-button,
-  &__print-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
+  &__checkout-button, &__print-button {
+    padding: 12px 20px;
     background-color: #2d7d6f;
     color: white;
     border: none;
     border-radius: 4px;
+    cursor: pointer;
     font-size: 16px;
     font-weight: 500;
-    cursor: pointer;
     text-decoration: none;
-
-    i {
-      margin-right: 8px;
-    }
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
 
     &:hover {
       background-color: darken(#2d7d6f, 10%);
     }
   }
 
+  &__print-button {
+    background-color: #2d7d6f;
+  }
+
   &__table-container {
     overflow-x: auto;
+    margin-bottom: 20px;
   }
 
   &__table {
@@ -93,38 +53,41 @@
     th, td {
       padding: 12px 15px;
       text-align: left;
-      border-bottom: 1px solid #e1e1e1;
+      border-bottom: 1px solid #e0e0e0;
     }
 
     th {
       background-color: #2d7d6f;
       color: white;
-      font-weight: 600;
+      font-weight: 500;
     }
 
-    &-number {
-      width: 50px;
-    }
-
-    &-price,
-    &-quantity,
-    &-total {
-      width: 150px;
-    }
-
-    &-actions {
-      width: 100px;
-    }
-  }
-
-  &__item {
-    &:hover {
+    tbody tr:nth-child(even) {
       background-color: #f9f9f9;
     }
 
-    &-name {
-      font-weight: 500;
+    tbody tr:hover {
+      background-color: #f0f0f0;
     }
+
+    tfoot {
+      font-weight: bold;
+
+      td {
+        padding-top: 15px;
+      }
+    }
+  }
+
+  &__product-name {
+    font-weight: 500;
+    color: #333;
+    max-width: 300px;
+  }
+
+  &__quantity-control {
+    display: flex;
+    align-items: center;
   }
 
   &__quantity-input {
@@ -135,89 +98,117 @@
     text-align: center;
   }
 
-  &__remove-button,
-  &__edit-button {
-    width: 36px;
-    height: 36px;
-    display: inline-flex;
+  &__item-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  &__remove-button, &__favorite-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 5px;
+
+    i {
+      font-style: normal;
+    }
   }
 
   &__remove-button {
-    background-color: #d9534f;
-    color: white;
+    color: #e74c3c;
 
     &:hover {
-      background-color: darken(#d9534f, 10%);
+      color: darken(#e74c3c, 10%);
     }
   }
 
-  &__edit-button {
-    background-color: #f0ad4e;
-    color: white;
+  &__favorite-button {
+    color: #f39c12;
 
     &:hover {
-      background-color: darken(#f0ad4e, 10%);
+      color: darken(#f39c12, 10%);
     }
   }
 
-  &__total-row {
-    font-weight: bold;
-    background-color: #f0f8f7;
-
-    td {
-      border-top: 2px solid #2d7d6f;
-    }
-  }
-
-  &__total-label,
-  &__total-value {
+  &__total-label {
     text-align: right;
+    font-weight: bold;
+  }
+
+  &__total-value {
+    font-weight: bold;
+    color: #2d7d6f;
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 40px 0;
+
+    p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #666;
+    }
+  }
+
+  &__continue-shopping {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #2d7d6f;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: darken(#2d7d6f, 10%);
+    }
+  }
+
+  &__loading, &__error {
+    text-align: center;
+    padding: 40px 0;
+    font-size: 18px;
+    color: #666;
+  }
+
+  &__error {
+    color: #e74c3c;
   }
 }
 
-.scroll-to-top {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  background-color: #2d7d6f;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 100;
-
-  &:hover {
-    background-color: darken(#2d7d6f, 10%);
-  }
+// Стили для иконок Font Awesome
+i[class^="fas"],
+i[class*=" fas"] {
+  font-style: normal !important;
 }
 
 // Стили для печати
 @media print {
-  .cart__actions,
-  .cart__item-actions,
-  .scroll-to-top,
-  header,
-  footer {
+  .cart {
+    &__actions, &__item-actions {
+      display: none;
+    }
+
+    &__table {
+      width: 100%;
+
+      th, td {
+        padding: 8px;
+      }
+    }
+  }
+
+  header, footer, .sidebar, .sidebar-overlay {
     display: none !important;
   }
 
-  .cart__table {
-    width: 100%;
-
-    th {
-      background-color: #f0f0f0 !important;
-      color: #000 !important;
-    }
+  .main {
+    padding: 0 !important;
+    margin: 0 !important;
   }
 }

@@ -1,13 +1,17 @@
 .admin-users {
+  width: 100%;
+  box-sizing: border-box;
+
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    width: 100%;
   }
 
   &__title {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
     color: #333;
     margin: 0;
@@ -16,7 +20,7 @@
   &__add-button {
     display: inline-flex;
     align-items: center;
-    padding: 10px 20px;
+    padding: 12px 24px;
     background-color: #2d7d6f;
     color: white;
     border: none;
@@ -25,25 +29,30 @@
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
+    box-sizing: border-box;
 
     &:hover {
       background-color: darken(#2d7d6f, 10%);
     }
 
     i {
-      margin-right: 8px;
+      margin-right: 10px;
     }
   }
 
-  &__loading {
+  &__loading, &__error, &__empty {
     text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  &__loading {
     padding: 30px;
     font-size: 18px;
     color: #666;
   }
 
   &__error {
-    text-align: center;
     padding: 15px;
     color: #d9534f;
     background-color: #f2dede;
@@ -53,7 +62,6 @@
   }
 
   &__empty {
-    text-align: center;
     padding: 30px;
     color: #666;
     background-color: #f9f9f9;
@@ -67,16 +75,51 @@
     overflow: hidden;
     margin-bottom: 20px;
     overflow-x: auto;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
+    box-sizing: border-box;
 
     th, td {
       padding: 12px 15px;
       text-align: left;
       border-bottom: 1px solid #e1e1e1;
+      word-break: break-word;
+      box-sizing: border-box;
+    }
+
+    // Задаем фиксированную ширину для колонки ID
+    th:first-child,
+    td:first-child {
+      width: 60px;
+      max-width: 60px;
+      text-align: center;
+    }
+
+    // Задаем ширину для колонки Роль
+    th:nth-child(4),
+    td:nth-child(4) {
+      width: 140px;
+      max-width: 140px;
+    }
+
+    // Задаем ширину для колонки Дата регистрации
+    th:nth-child(5),
+    td:nth-child(5) {
+      width: 140px;
+      max-width: 140px;
+    }
+
+    // Задаем ширину для колонки Действия
+    th:last-child,
+    td:last-child {
+      width: 120px;
+      max-width: 120px;
     }
 
     th {
@@ -94,28 +137,10 @@
     }
   }
 
-  &__role {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-
-    &--admin {
-      background-color: #d9534f;
-      color: white;
-    }
-
-    &--user {
-      background-color: #5bc0de;
-      color: white;
-    }
-  }
-
   &__actions {
     display: flex;
     gap: 8px;
+    justify-content: center;
   }
 
   &__edit-button,
@@ -129,6 +154,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-width: 40px;
+    box-sizing: border-box;
   }
 
   &__edit-button {
@@ -154,6 +181,8 @@
     justify-content: center;
     gap: 5px;
     margin-top: 20px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__page-button {
@@ -168,6 +197,7 @@
     color: #333;
     font-size: 14px;
     cursor: pointer;
+    box-sizing: border-box;
 
     &:hover {
       background-color: #f5f5f5;
@@ -181,47 +211,76 @@
     }
   }
 
-  &__search {
+  &__modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
-    margin-bottom: 20px;
-    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
 
-    input {
-      flex: 1;
-      padding: 10px 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 16px;
+  &__modal {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
 
-      &:focus {
-        outline: none;
-        border-color: #2d7d6f;
-      }
+    h3 {
+      margin-top: 0;
+      color: #333;
     }
 
-    button {
-      padding: 10px 20px;
-      background-color: #2d7d6f;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
+    p {
+      margin-bottom: 20px;
+    }
+  }
 
-      i {
-        margin-right: 5px;
-      }
+  &__modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
 
-      &:hover {
-        background-color: darken(#2d7d6f, 10%);
-      }
+  &__modal-cancel,
+  &__modal-confirm {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+
+  &__modal-cancel {
+    background-color: #f5f5f5;
+    color: #333;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+
+  &__modal-confirm {
+    background-color: #d9534f;
+    color: white;
+
+    &:hover {
+      background-color: darken(#d9534f, 10%);
     }
   }
 
   // Адаптивность для мобильных устройств
   @media (max-width: 768px) {
+    padding: 20px 0;
+
     &__header {
       flex-direction: column;
       align-items: flex-start;
@@ -233,15 +292,6 @@
       justify-content: center;
     }
 
-    &__search {
-      flex-direction: column;
-
-      button {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
     &__actions {
       flex-direction: column;
       gap: 5px;
@@ -250,6 +300,18 @@
     &__edit-button,
     &__delete-button {
       width: 100%;
+    }
+
+    &__table {
+      th, td {
+        padding: 8px 10px;
+      }
+
+      th:first-child,
+      td:first-child {
+        width: 40px;
+        max-width: 40px;
+      }
     }
   }
 }

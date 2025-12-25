@@ -1,251 +1,342 @@
-// Базовый URL API
-const API_URL = 'https://api.perforyou.ru'; // Замените на ваш реальный URL API
+// src/services/api.js
+import { products, users, cart, orders } from './mockData';
 
-// Функция для получения заголовков с токеном авторизации
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return {
-    'Authorization': token ? `Bearer ${token}` : '',
-  };
-};
-
-// Обработчик ответов от API
-const handleResponse = async (response) => {
-  if (!response.ok) {
-    // Если статус 401, значит токен истек или недействителен
-    if (response.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-
-    // Пытаемся получить текст ошибки из ответа
-    const errorText = await response.text();
-    let errorMessage;
-    try {
-      const errorData = JSON.parse(errorText);
-      errorMessage = errorData.message || 'Произошла ошибка при выполнении запроса';
-    } catch (e) {
-      errorMessage = errorText || 'Произошла ошибка при выполнении запроса';
-    }
-
-    throw new Error(errorMessage);
-  }
-
-  return response.json();
-};
+// Функция для имитации задержки сети
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Аутентификация
 export const login = async (email, password) => {
-  const response = await fetch(`${API_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  });
-  return handleResponse(response);
-};
+  await delay(800); // Имитация задержки сети
 
-export const register = async (userData) => {
-  const response = await fetch(`${API_URL}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(userData),
-  });
-  return handleResponse(response);
-};
+  const user = users.find(u => u.email === email);
 
-export const logout = async () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  // Можно также отправить запрос на сервер для инвалидации токена
+  if (!user || user.password !== password) {
+    throw new Error('Неверный email или пароль');
+  }
+
+  // Создаем фейковый токен
+  const token = `fake-token-${Date.now()}`;
+
+  return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
 };
 
 // Товары
-export const getProducts = async (page = 1, perPage = 50, sortField = 'name', sortDirection = 'asc') => {
-  const response = await fetch(`${API_URL}/products?page=${page}&per_page=${perPage}&sort=${sortField}&direction=${sortDirection}`);
-  return handleResponse(response);
+export const getProducts = async (page = 1, perPage = 10) => {
+  await delay(800);
+
+  const start = (page - 1) * perPage;
+  const end = start + perPage;
+  const paginatedProducts = products.slice(start, end);
+
+  return {
+    products: paginatedProducts,
+    total_count: products.length
+  };
 };
 
-export const searchProducts = async (query, category = null, minPrice = null, maxPrice = null, page = 1, perPage = 50, sortField = 'name', sortDirection = 'asc') => {
-  let url = `${API_URL}/products/search?query=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}&sort=${sortField}&direction=${sortDirection}`;
+// Поиск товаров
+export const searchProducts = async (query) => {
+  await delay(500);
 
-  if (category) url += `&category=${encodeURIComponent(category)}`;
-  if (minPrice) url += `&min_price=${minPrice}`;
-  if (maxPrice) url += `&max_price=${maxPrice}`;
+  if (!query) {
+    return getProducts(); // Возвращаем все товары, если запрос пустой
+  }
 
-  const response = await fetch(url);
-  return handleResponse(response);
+  const searchQuery = query.toLowerCase();
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchQuery)
+  );
+
+  return {
+    products: filteredProducts,
+    total_count: filteredProducts.length
+  };
 };
 
 export const getProductById = async (id) => {
-  const response = await fetch(`${API_URL}/products/${id}`);
-  return handleResponse(response);
+  await delay(500);
+
+  const product = products.find(p => p.id === parseInt(id));
+
+  if (!product) {
+    throw new Error('Товар не найден');
+  }
+
+  return product;
+};
+
+export const createProduct = async (productData) => {
+  await delay(800);
+
+  const newProduct = {
+    id: products.length + 1,
+    ...productData,
+    updated_date: new Date().toISOString().split('T')[0]
+  };
+
+  products.push(newProduct);
+
+  return newProduct;
+};
+
+export const updateProduct = async (id, productData) => {
+  await delay(800);
+
+  const index = products.findIndex(p => p.id === parseInt(id));
+
+  if (index === -1) {
+    throw new Error('Товар не найден');
+  }
+
+  const updatedProduct = {
+    ...products[index],
+    ...productData,
+    updated_date: new Date().toISOString().split('T')[0]
+  };
+
+  products[index] = updatedProduct;
+
+  return updatedProduct;
+};
+
+export const deleteProduct = async (id) => {
+  await delay(800);
+
+  const index = products.findIndex(p => p.id === parseInt(id));
+
+  if (index === -1) {
+    throw new Error('Товар не найден');
+  }
+
+  products.splice(index, 1);
+
+  return { success: true };
+};
+
+// Пользователи
+export const getUsers = async (page = 1, perPage = 10) => {
+  await delay(800);
+
+  const start = (page - 1) * perPage;
+  const end = start + perPage;
+  const paginatedUsers = users.slice(start, end).map(user => {
+    // Не возвращаем пароли
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  });
+
+  return {
+    users: paginatedUsers,
+    total_count: users.length
+  };
+};
+
+export const getUserById = async (id) => {
+  await delay(500);
+
+  const user = users.find(u => u.id === parseInt(id));
+
+  if (!user) {
+    throw new Error('Пользователь не найден');
+  }
+
+  // Не возвращаем пароль
+  const { password, ...userWithoutPassword } = user;
+  return userWithoutPassword;
+};
+
+export const createUser = async (userData) => {
+  await delay(800);
+
+  const newUser = {
+    id: users.length + 1,
+    ...userData,
+    created_at: new Date().toISOString()
+  };
+
+  users.push(newUser);
+
+  // Не возвращаем пароль
+  const { password, ...userWithoutPassword } = newUser;
+  return userWithoutPassword;
+};
+
+export const updateUser = async (id, userData) => {
+  await delay(800);
+
+  const index = users.findIndex(u => u.id === parseInt(id));
+
+  if (index === -1) {
+    throw new Error('Пользователь не найден');
+  }
+
+  const updatedUser = {
+    ...users[index],
+    ...userData
+  };
+
+  users[index] = updatedUser;
+
+  // Не возвращаем пароль
+  const { password, ...userWithoutPassword } = updatedUser;
+  return userWithoutPassword;
+};
+
+export const deleteUser = async (id) => {
+  await delay(800);
+
+  const index = users.findIndex(u => u.id === parseInt(id));
+
+  if (index === -1) {
+    throw new Error('Пользователь не найден');
+  }
+
+  users.splice(index, 1);
+
+  return { success: true };
 };
 
 // Корзина
 export const getCartItems = async () => {
-  const response = await fetch(`${API_URL}/cart`, {
-    headers: getAuthHeaders(),
-  });
-  return handleResponse(response);
+  await delay(500);
+  return cart;
 };
 
 export const addToCart = async (productId, quantity = 1) => {
-  const response = await fetch(`${API_URL}/cart/add`, {
-    method: 'POST',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ product_id: productId, quantity }),
-  });
-  return handleResponse(response);
+  await delay(500);
+
+  const product = products.find(p => p.id === parseInt(productId));
+
+  if (!product) {
+    throw new Error('Товар не найден');
+  }
+
+  const existingItemIndex = cart.items.findIndex(item => item.product_id === parseInt(productId));
+
+  if (existingItemIndex !== -1) {
+    // Увеличиваем количество, если товар уже в корзине
+    cart.items[existingItemIndex].quantity += quantity;
+  } else {
+    // Добавляем новый товар в корзину
+    cart.items.push({
+      id: cart.items.length + 1,
+      product_id: product.id,
+      product: product,
+      quantity: quantity,
+      price: product.price
+    });
+  }
+
+  // Пересчитываем общую сумму
+  cart.total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  return cart;
 };
 
 export const updateCartItem = async (itemId, quantity) => {
-  const response = await fetch(`${API_URL}/cart/update/${itemId}`, {
-    method: 'PUT',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ quantity }),
-  });
-  return handleResponse(response);
+  await delay(500);
+
+  const itemIndex = cart.items.findIndex(item => item.id === parseInt(itemId));
+
+  if (itemIndex === -1) {
+    throw new Error('Товар не найден в корзине');
+  }
+
+  if (quantity <= 0) {
+    // Удаляем товар из корзины
+    cart.items.splice(itemIndex, 1);
+  } else {
+    // Обновляем количество
+    cart.items[itemIndex].quantity = quantity;
+  }
+
+  // Пересчитываем общую сумму
+  cart.total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  return cart;
 };
 
 export const removeFromCart = async (itemId) => {
-  const response = await fetch(`${API_URL}/cart/remove/${itemId}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  return handleResponse(response);
+  await delay(500);
+
+  const itemIndex = cart.items.findIndex(item => item.id === parseInt(itemId));
+
+  if (itemIndex === -1) {
+    throw new Error('Товар не найден в корзине');
+  }
+
+  // Удаляем товар из корзины
+  cart.items.splice(itemIndex, 1);
+
+  // Пересчитываем общую сумму
+  cart.total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  return cart;
+};
+
+export const clearCart = async () => {
+  await delay(500);
+
+  cart.items = [];
+  cart.total = 0;
+
+  return cart;
 };
 
 // Заказы
 export const createOrder = async (orderData) => {
-  const response = await fetch(`${API_URL}/orders`, {
-    method: 'POST',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(orderData),
-  });
-  return handleResponse(response);
+  await delay(800);
+
+  const newOrder = {
+    id: orders.length + 1,
+    ...orderData,
+    created_at: new Date().toISOString(),
+    status: 'pending'
+  };
+
+  orders.push(newOrder);
+
+  // Очищаем корзину после создания заказа
+  await clearCart();
+
+  return newOrder;
+};
+
+export const getOrders = async (page = 1, perPage = 10) => {
+  await delay(800);
+
+  const start = (page - 1) * perPage;
+  const end = start + perPage;
+  const paginatedOrders = orders.slice(start, end);
+
+  return {
+    orders: paginatedOrders,
+    total_count: orders.length
+  };
 };
 
 export const getOrderById = async (id) => {
-  const response = await fetch(`${API_URL}/orders/${id}`, {
-    headers: getAuthHeaders(),
-  });
-  return handleResponse(response);
-};
+  await delay(500);
 
-export const getUserOrders = async (page = 1, perPage = 10) => {
-  const response = await fetch(`${API_URL}/orders/user?page=${page}&per_page=${perPage}`, {
-    headers: getAuthHeaders(),
-  });
-  return handleResponse(response);
-};
+  const order = orders.find(o => o.id === parseInt(id));
 
-// Административные функции для товаров
-export const createProduct = async (productData) => {
-  const response = await fetch(`${API_URL}/admin/products`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: productData // FormData для загрузки файлов
-  });
-  return handleResponse(response);
-};
+  if (!order) {
+    throw new Error('Заказ не найден');
+  }
 
-export const updateProduct = async (id, productData) => {
-  const response = await fetch(`${API_URL}/admin/products/${id}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: productData // FormData для загрузки файлов
-  });
-  return handleResponse(response);
-};
-
-export const deleteProduct = async (id) => {
-  const response = await fetch(`${API_URL}/admin/products/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders()
-  });
-  return handleResponse(response);
-};
-
-// Административные функции для пользователей
-export const getUsers = async (page = 1, perPage = 20) => {
-  const response = await fetch(`${API_URL}/admin/users?page=${page}&per_page=${perPage}`, {
-    headers: getAuthHeaders()
-  });
-  return handleResponse(response);
-};
-
-export const getUserById = async (id) => {
-  const response = await fetch(`${API_URL}/admin/users/${id}`, {
-    headers: getAuthHeaders()
-  });
-  return handleResponse(response);
-};
-
-export const createUser = async (userData) => {
-  const response = await fetch(`${API_URL}/admin/users`, {
-    method: 'POST',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(userData)
-  });
-  return handleResponse(response);
-};
-
-export const updateUser = async (id, userData) => {
-  const response = await fetch(`${API_URL}/admin/users/${id}`, {
-    method: 'PUT',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(userData)
-  });
-  return handleResponse(response);
-};
-
-export const deleteUser = async (id) => {
-  const response = await fetch(`${API_URL}/admin/users/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders()
-  });
-  return handleResponse(response);
-};
-
-// Административные функции для заказов
-export const getAllOrders = async (page = 1, perPage = 20, status = null) => {
-  let url = `${API_URL}/admin/orders?page=${page}&per_page=${perPage}`;
-  if (status) url += `&status=${status}`;
-
-  const response = await fetch(url, {
-    headers: getAuthHeaders()
-  });
-  return handleResponse(response);
+  return order;
 };
 
 export const updateOrderStatus = async (id, status) => {
-  const response = await fetch(`${API_URL}/admin/orders/${id}/status`, {
-    method: 'PUT',
-    headers: {
-      ...getAuthHeaders(),
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ status })
-  });
-  return handleResponse(response);
+  await delay(800);
+
+  const orderIndex = orders.findIndex(o => o.id === parseInt(id));
+
+  if (orderIndex === -1) {
+    throw new Error('Заказ не найден');
+  }
+
+  orders[orderIndex].status = status;
+
+  return orders[orderIndex];
 };

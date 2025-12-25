@@ -1,53 +1,120 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+// Импорт Font Awesome
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
 
-body {
-  font-family: 'Arial', sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background-color: #f8f8f8;
-}
-
+// Основные стили приложения
 .app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
+// Основной контент
 .main {
   flex: 1;
+  padding: 20px;
+  transition: margin-left 0.3s ease;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+
+  // Убираем сдвиг контента при открытии сайдбара
+  &.sidebar-visible {
+    // margin-left: 280px; // Закомментировано, чтобы контент не сдвигался
+  }
+
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
 }
 
+// Спиннер загрузки
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  font-size: 18px;
+  color: #1e5e53;
+
+  &:before {
+    content: '';
+    width: 30px;
+    height: 30px;
+    border: 3px solid #e0e0e0;
+    border-top-color: #1e5e53;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Футер
+.footer {
+  background-color: #f8f8f8;
+  padding: 20px 0;
+  width: 100%;
+  max-width: 100%;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+// Контейнер
 .container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 15px;
+  box-sizing: border-box;
 }
 
-// Иконки (можно заменить на библиотеку иконок, например, Font Awesome)
-.icon-search:before {
-  content: "🔍";
+// Стили для иконок Font Awesome, чтобы они не были наклонены
+i[class^="fas "],
+i[class*=" fas "] {
+  font-style: normal !important;
+  font-weight: 900;
+  font-family: 'Font Awesome 5 Free', sans-serif !important;
 }
 
-.icon-info:before {
-  content: "ℹ️";
+// Стили для кнопок
+button {
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
 }
 
-.icon-sort:before {
-  content: "↕️";
+// Стили для ссылок
+a {
+  text-decoration: none;
+  color: #1e5e53;
+
+  &:hover {
+    color: darken(#1e5e53, 10%);
+  }
 }
 
-.icon-cart:before {
-  content: "🛒";
-}
-
-.icon-arrow-up:before {
-  content: "↑";
-}
-
-.icon-logout:before {
-  content: "🚪";
+// Общие стили для защищенных маршрутов
+.protected-route {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
 }

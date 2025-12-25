@@ -1,8 +1,12 @@
-.login {
+* {
+  box-sizing: border-box;
+}
+
+.auth {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 200px); // Учитываем высоту хедера и футера
+  min-height: 100vh;
   background-color: #f8f8f8;
   padding: 20px;
 
@@ -13,24 +17,20 @@
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 30px;
+    box-sizing: border-box;
   }
 
   &__logo {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 
     img {
-      height: 60px;
+      height: 320px;
+      width: auto;
       margin-bottom: 10px;
-    }
-
-    h1 {
-      font-size: 18px;
-      font-weight: bold;
-      color: #ff6b8a; // Розовый цвет из логотипа
-      text-transform: uppercase;
+      max-width: 100%; // Гарантирует, что изображение не выйдет за пределы контейнера
     }
   }
 
@@ -54,10 +54,12 @@
 
   &__form {
     margin-bottom: 20px;
+    width: 100%;
   }
 
   &__form-group {
     margin-bottom: 20px;
+    width: 100%;
 
     label {
       display: block;
@@ -73,6 +75,7 @@
       border-radius: 4px;
       font-size: 16px;
       transition: border-color 0.2s;
+      box-sizing: border-box;
 
       &:focus {
         outline: none;
@@ -96,9 +99,12 @@
 
   &__password-input {
     position: relative;
+    width: 100%;
 
     input {
-      padding-right: 45px; // Место для кнопки показать/скрыть
+      width: 100%;
+      padding-right: 45px;
+      box-sizing: border-box;
     }
   }
 
@@ -117,6 +123,10 @@
     &:hover {
       color: #2d7d6f;
     }
+
+    i {
+      font-size: 16px;
+    }
   }
 
   &__submit-button {
@@ -130,6 +140,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s;
+    box-sizing: border-box;
 
     &:hover {
       background-color: darken(#2d7d6f, 10%);
@@ -146,6 +157,7 @@
     color: #666;
     font-size: 14px;
     line-height: 1.5;
+    width: 100%;
 
     p {
       margin-bottom: 10px;
@@ -157,14 +169,9 @@
     &__container {
       padding: 20px;
     }
+
+    &__logo img {
+      height: 250px; // Уменьшаем размер логотипа на мобильных устройствах
+    }
   }
-}
-
-// Иконки (замените на свою библиотеку иконок)
-.icon-eye:before {
-  content: "👁️";
-}
-
-.icon-eye-off:before {
-  content: "🔒";
 }
